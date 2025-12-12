@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     aima_login_url: str = "https://services.aima.gov.pt/RAR/login.php"
     aima_check_url: str = "https://services.aima.gov.pt/RAR/login_check3.php"
 
+    # SSL verification (set to False if AIMA has certificate issues)
+    verify_ssl: bool = False
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

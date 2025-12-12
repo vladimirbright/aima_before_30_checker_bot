@@ -82,6 +82,8 @@ The web interface will be available at `http://localhost:8000`
 - `/start` - Set up credentials and enable monitoring
 - `/status` - Check status immediately
 - `/stop` - Disable periodic checks (keeps credentials)
+- `/delete` - Completely delete all your data
+- `/help` - Show help message with all commands
 - `/cancel` - Cancel current operation
 
 ### Periodic Checks
@@ -216,6 +218,8 @@ EAIMA/
 - **Per-User Keys**: Each user's data is encrypted with a unique key derived from bot token + user ID
 - **No Plaintext Storage**: Passwords are never stored in plaintext
 - **Secure Deletion**: Password messages are deleted from Telegram after processing
+- **Data Control**: Users can delete all their data with `/delete` command
+- **Auto-Cleanup**: Data is automatically deleted when users block/remove the bot
 - **HTTPS**: Use reverse proxy for production deployment
 
 ## How It Works

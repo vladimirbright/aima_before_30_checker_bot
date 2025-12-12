@@ -13,38 +13,38 @@ dev:
 # Build Docker image
 build:
 	@echo "Building Docker image..."
-	docker-compose build
+	docker compose build
 
 # Start services with Docker Compose
 up:
 	@echo "Starting services..."
-	docker-compose up -d
+	docker compose up -d
 	@echo "Services started. Check status with: make logs"
 
 # Stop services
 down:
 	@echo "Stopping services..."
-	docker-compose down
+	docker compose down
 
 # View logs
 logs:
 	@echo "Showing logs (Ctrl+C to exit)..."
-	docker-compose logs -f
+	docker compose logs -f
 
 # Access container shell
 shell:
 	@echo "Opening shell in container..."
-	docker-compose exec aima-checker /bin/bash
+	docker compose exec aima-checker /bin/bash
 
 # Restart services
 restart:
 	@echo "Restarting services..."
-	docker-compose restart
+	docker compose restart
 
 # Clean up (remove containers, volumes, and database)
 clean:
 	@echo "Cleaning up..."
-	docker-compose down -v
+	docker compose down -v
 	rm -rf data/*.db
 	@echo "Cleanup complete"
 
@@ -66,11 +66,11 @@ lint:
 # Show service status
 status:
 	@echo "Service status:"
-	docker-compose ps
+	docker compose ps
 
 # View application logs only
 app-logs:
-	docker-compose logs -f aima-checker
+	docker compose logs -f aima-checker
 
 # Help
 help:

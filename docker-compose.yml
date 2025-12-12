@@ -11,9 +11,10 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - DATABASE_PATH=/app/data/aima.db
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
       - AIMA_LOGIN_URL=${AIMA_LOGIN_URL:-https://services.aima.gov.pt/RAR/login.php}
       - AIMA_CHECK_URL=${AIMA_CHECK_URL:-https://services.aima.gov.pt/RAR/login_check3.php}
+      - VERIFY_SSL=${VERIFY_SSL:-false}
     volumes:
       - ./data:/app/data
     restart: unless-stopped

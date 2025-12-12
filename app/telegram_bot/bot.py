@@ -1,12 +1,15 @@
 """Telegram bot initialization and management."""
 
 import logging
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application, CommandHandler, ChatMemberHandler
 from app.config import settings
 from app.telegram_bot.handlers import (
     get_conversation_handler,
     status,
-    stop
+    stop,
+    delete_user_data,
+    help_command,
+    handle_bot_blocked
 )
 
 
@@ -29,6 +32,11 @@ def create_bot_application() -> Application:
     # Add command handlers
     application.add_handler(CommandHandler("status", status))
     application.add_handler(CommandHandler("stop", stop))
+    application.add_handler(CommandHandler("delete", delete_user_data))
+    application.add_handler(CommandHandler("help", help_command))
+
+    # Add handler for when user blocks/deletes the bot
+    application.add_handler(ChatMemberHandler(handle_bot_blocked, ChatMemberHandler.MY_CHAT_MEMBER))
 
     logger.info("Telegram bot handlers registered")
 
@@ -48,9 +56,9 @@ async def start_bot(application: Application) -> None:
     await application.initialize()
     await application.start()
 
-    # Start polling
+    # Start polling (include my_chat_member for blocked/unblocked events)
     await application.updater.start_polling(
-        allowed_updates=["message", "callback_query"]
+        allowed_updates=["message", "callback_query", "my_chat_member"]
     )
 
     logger.info("Telegram bot started successfully")
