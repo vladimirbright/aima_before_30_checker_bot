@@ -15,6 +15,7 @@ from app import aima_checker
 from app.services import user_service
 from app.crypto import get_encryption_key, encrypt_value, decrypt_value, EncryptionError
 from app.config import settings
+from app.utils import format_timestamp
 
 
 logger = logging.getLogger(__name__)
@@ -131,10 +132,11 @@ async def receive_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         return ConversationHandler.END
 
     # Send status result
+    timestamp_formatted = format_timestamp(result['timestamp'])
     await status_msg.edit_text(
         f"✅ Status Retrieved Successfully!\n\n"
         f"{result['status_text']}\n\n"
-        f"Last checked: {result['timestamp']}"
+        f"Last checked: {timestamp_formatted}"
     )
 
     # Ask about periodic checks
@@ -232,9 +234,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     result = await aima_checker.login_and_get_status(email, password)
 
     if result['status'] == 'error':
+        timestamp_formatted = format_timestamp(result['timestamp'])
         await status_msg.edit_text(
             f"❌ Error: {result['error']}\n\n"
-            f"Time: {result['timestamp']}"
+            f"Time: {timestamp_formatted}"
         )
     else:
         # Update last status
@@ -244,10 +247,11 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             result['timestamp']
         )
 
+        timestamp_formatted = format_timestamp(result['timestamp'])
         await status_msg.edit_text(
             f"✅ Current Status:\n\n"
             f"{result['status_text']}\n\n"
-            f"Last checked: {result['timestamp']}"
+            f"Last checked: {timestamp_formatted}"
         )
 
 

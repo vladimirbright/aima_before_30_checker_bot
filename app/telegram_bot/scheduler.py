@@ -13,6 +13,7 @@ from app import aima_checker
 from app.services import user_service
 from app.crypto import get_encryption_key, decrypt_value, EncryptionError
 from app.config import settings
+from app.utils import format_timestamp
 
 
 logger = logging.getLogger(__name__)
@@ -185,8 +186,9 @@ class StatusScheduler:
 
             # Send notification
             if should_notify:
+                timestamp_formatted = format_timestamp(result['timestamp'])
                 message = f"{notification_reason}\n\n{result['status_text']}\n\n"
-                message += f"Last checked: {result['timestamp']}"
+                message += f"Last checked: {timestamp_formatted}"
 
                 await self.bot.send_message(
                     chat_id=user_id,
