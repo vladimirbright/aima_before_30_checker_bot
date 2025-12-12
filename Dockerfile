@@ -1,7 +1,7 @@
 # Multi-stage build for AIMA Status Checker
 
 # Stage 1: Builder - Install dependencies with Poetry
-FROM python:3.11-slim as builder
+FROM python:3.13-slim as builder
 
 # Install Poetry
 RUN pip install --no-cache-dir poetry==2.2.1
@@ -20,7 +20,7 @@ RUN poetry config virtualenvs.in-project true
 RUN poetry install --no-root --only main
 
 # Stage 2: Runtime - Copy venv and run application
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 

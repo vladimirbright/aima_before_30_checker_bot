@@ -6,7 +6,7 @@ authors = ["Vladimir Bright"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.13"
 fastapi = "^0.115.0"
 uvicorn = {extras = ["standard"], version = "^0.32.0"}
 httpx = "^0.28.0"
