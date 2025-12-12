@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMA Application Status Checker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: none;
+            border-radius: 15px;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 20px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #63358c 100%);
+        }
+        #result {
+            margin-top: 20px;
+            white-space: pre-wrap;
+        }
+        .spinner-border {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h3 class="mb-0">AIMA Status Checker</h3>
+                        <p class="mb-0 mt-2 small">Check your application status instantly</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="checkForm">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    required
+                                    placeholder="your.email@example.com"
+                                >
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="password"
+                                    name="password"
+                                    required
+                                    placeholder="Your password"
+                                >
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                    <span id="btnText">Check Status</span>
+                                    <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div id="result"></div>
+                    </div>
+                </div>
+                <div class="text-center mt-3 text-white">
+                    <small>Secure connection to AIMA services</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('checkForm');
+        const resultDiv = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Show loading state
+            submitBtn.disabled = true;
+            btnText.textContent = 'Checking...';
+            btnSpinner.classList.remove('d-none');
+            resultDiv.innerHTML = '';
+
+            // Get form data
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/check', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Display result
+                if (data.status === 'success') {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5 class="alert-heading">Status Retrieved Successfully</h5>
+                            <hr>
+                            <p class="mb-0">${escapeHtml(data.status_text)}</p>
+                            <hr>
+                            <small class="text-muted">Last checked: ${new Date(data.timestamp).toLocaleString()}</small>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">Error</h5>
+                            <p class="mb-0">${escapeHtml(data.error)}</p>
+                            <hr>
+                            <small class="text-muted">${new Date(data.timestamp).toLocaleString()}</small>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">Connection Error</h5>
+                        <p class="mb-0">Failed to connect to server. Please try again.</p>
+                    </div>
+                `;
+            } finally {
+                // Reset button state
+                submitBtn.disabled = false;
+                btnText.textContent = 'Check Status';
+                btnSpinner.classList.add('d-none');
+            }
+        });
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

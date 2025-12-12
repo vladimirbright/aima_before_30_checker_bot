@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "eaima"
+version = "0.1.0"
+description = "AIMA application status checker with web interface and Telegram bot"
+authors = ["Vladimir Bright"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
+httpx = "^0.28.0"
+beautifulsoup4 = "^4.12.3"
+lxml = "^5.3.0"
+aiosqlite = "^0.20.0"
+cryptography = "^44.0.0"
+python-telegram-bot = {extras = ["job-queue"], version = "^21.0"}
+pydantic-settings = "^2.6.0"
+python-multipart = "^0.0.17"
+jinja2 = "^3.1.4"
+pytz = "^2024.2"
+apscheduler = "^3.10.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+pytest-asyncio = "^0.24.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

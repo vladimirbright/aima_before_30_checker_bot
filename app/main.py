@@ -1,0 +1,109 @@
+"""Main FastAPI application with Telegram bot integration."""
+
+import logging
+import asyncio
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.config import settings
+from app.database import init_db, close_db
+from app.routers import web
+from app.telegram_bot.bot import create_bot_application, start_bot, stop_bot
+from app.telegram_bot.scheduler import StatusScheduler
+
+
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, settings.log_level.upper(), logging.INFO),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+logger = logging.getLogger(__name__)
+
+# Global bot application and scheduler
+bot_app = None
+scheduler = None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for startup and shutdown events.
+
+    Args:
+        app: FastAPI application
+    """
+    # Startup
+    logger.info("Starting AIMA Status Checker...")
+
+    # Initialize database
+    await init_db()
+    logger.info("Database initialized")
+
+    # Create and start bot
+    global bot_app, scheduler
+    bot_app = create_bot_application()
+
+    # Start bot in background
+    await start_bot(bot_app)
+
+    # Create and start scheduler
+    scheduler = StatusScheduler(bot_app.bot)
+    scheduler.start()
+
+    logger.info("Application started successfully")
+
+    yield
+
+    # Shutdown
+    logger.info("Shutting down application...")
+
+    # Stop scheduler
+    if scheduler:
+        scheduler.stop()
+
+    # Stop bot
+    if bot_app:
+        await stop_bot(bot_app)
+
+    # Close database
+    await close_db()
+
+    logger.info("Application stopped")
+
+
+# Create FastAPI app
+app = FastAPI(
+    title="AIMA Status Checker",
+    description="Check AIMA application status via web interface or Telegram bot",
+    version="0.1.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware (optional, for web interface)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers
+app.include_router(web.router)
+
+
+@app.get("/")
+async def root():
+    """Root endpoint redirect to web interface."""
+    return {"message": "AIMA Status Checker - Use web interface or Telegram bot"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=False
+    )

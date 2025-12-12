@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  aima-checker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aima-checker
+    ports:
+      - "8000:8000"
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DATABASE_PATH=/app/data/aima.db
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - AIMA_LOGIN_URL=${AIMA_LOGIN_URL:-https://services.aima.gov.pt/RAR/login.php}
+      - AIMA_CHECK_URL=${AIMA_CHECK_URL:-https://services.aima.gov.pt/RAR/login_check3.php}
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
