@@ -1,6 +1,7 @@
 """Main FastAPI application with Telegram bot integration."""
 
 import logging
+import sys
 import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -12,13 +13,31 @@ from app.telegram_bot.bot import create_bot_application, start_bot, stop_bot
 from app.telegram_bot.scheduler import StatusScheduler
 
 
-# Configure logging
+# Configure logging to output to stdout/stderr
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ],
+    force=True  # Force reconfiguration
 )
 
+# Set log level for all loggers
+logging.getLogger().setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
+
 logger = logging.getLogger(__name__)
+
+# Log startup configuration
+logger.info("="*60)
+logger.info("AIMA Status Checker - Configuration")
+logger.info("="*60)
+logger.info(f"Log Level: {settings.log_level}")
+logger.info(f"Database Path: {settings.database_path}")
+logger.info(f"AIMA Login URL: {settings.aima_login_url}")
+logger.info(f"AIMA Check URL: {settings.aima_check_url}")
+logger.info(f"SSL Verification: {settings.verify_ssl}")
+logger.info("="*60)
 
 # Global bot application and scheduler
 bot_app = None
@@ -90,13 +109,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(web.router)
-
-
-@app.get("/")
-async def root():
-    """Root endpoint redirect to web interface."""
-    return {"message": "AIMA Status Checker - Use web interface or Telegram bot"}
+app.include_router(web.router, tags=["web"])
 
 
 if __name__ == "__main__":

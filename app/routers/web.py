@@ -39,3 +39,16 @@ async def check_status(
 async def health_check():
     """Health check endpoint for Docker."""
     return {"status": "ok"}
+
+
+@router.get("/config")
+async def get_config():
+    """Get current configuration (for debugging)."""
+    from app.config import settings
+    return {
+        "log_level": settings.log_level,
+        "database_path": settings.database_path,
+        "aima_login_url": settings.aima_login_url,
+        "aima_check_url": settings.aima_check_url,
+        "verify_ssl": settings.verify_ssl
+    }
