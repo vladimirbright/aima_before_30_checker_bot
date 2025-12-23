@@ -1,5 +1,6 @@
 """Application configuration using pydantic-settings."""
 
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +22,9 @@ class Settings(BaseSettings):
 
     # SSL verification (set to False if AIMA has certificate issues)
     verify_ssl: bool = False
+
+    # HTTP/HTTPS Proxy (optional)
+    proxy_url: Optional[str] = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

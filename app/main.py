@@ -4,6 +4,7 @@ import logging
 import sys
 import asyncio
 from contextlib import asynccontextmanager
+from urllib.parse import urlparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
@@ -37,6 +38,18 @@ logger.info(f"Database Path: {settings.database_path}")
 logger.info(f"AIMA Login URL: {settings.aima_login_url}")
 logger.info(f"AIMA Check URL: {settings.aima_check_url}")
 logger.info(f"SSL Verification: {settings.verify_ssl}")
+
+# Mask credentials in proxy URL for logging
+if settings.proxy_url:
+    parsed = urlparse(settings.proxy_url)
+    if parsed.username:
+        masked_proxy = f"{parsed.scheme}://***:***@{parsed.hostname}:{parsed.port}"
+    else:
+        masked_proxy = settings.proxy_url
+    logger.info(f"HTTP Proxy: {masked_proxy}")
+else:
+    logger.info("HTTP Proxy: Not configured")
+
 logger.info("="*60)
 
 # Global bot application and scheduler
