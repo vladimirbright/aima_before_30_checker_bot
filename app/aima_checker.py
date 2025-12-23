@@ -86,15 +86,17 @@ def sanitize_status_text(html_content: str) -> str:
     return text
 
 
-async def login_and_get_status(email: str, password: str) -> Dict:
+async def login_and_get_status(email: str, password: str, user_agent: str = None) -> Dict:
     """
     Login to AIMA website and retrieve application status.
 
     All HTTP requests will use the configured proxy if PROXY_URL is set in settings.
+    User-Agent header will be set if user_agent parameter is provided.
 
     Args:
         email: User email address
         password: User password
+        user_agent: User agent string for the request (optional)
 
     Returns:
         dict: Response with status
@@ -121,13 +123,20 @@ async def login_and_get_status(email: str, password: str) -> Dict:
         pool=120.0,
     )
 
+    # Build headers with user agent
+    headers = {}
+    if user_agent:
+        headers["User-Agent"] = user_agent
+        logger.debug(f"Using user agent: {user_agent[:50]}...")
+
     try:
         # Create client with cookies enabled
         async with httpx.AsyncClient(
             follow_redirects=True,
             timeout=timeout,
             verify=settings.verify_ssl,
-            proxy=settings.proxy_url
+            proxy=settings.proxy_url,
+            headers=headers
         ) as client:
 
             logger.debug("Created HTTP client")

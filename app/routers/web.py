@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from app import aima_checker
+from app.constants import get_random_user_agent
 
 
 router = APIRouter()
@@ -31,7 +32,9 @@ async def check_status(
     Returns:
         JSONResponse: Status check result
     """
-    result = await aima_checker.login_and_get_status(email, password)
+    # For web interface without user context, use a random user agent
+    user_agent = get_random_user_agent()
+    result = await aima_checker.login_and_get_status(email, password, user_agent)
     return JSONResponse(content=result)
 
 

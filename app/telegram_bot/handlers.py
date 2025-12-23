@@ -16,6 +16,7 @@ from app.services import user_service
 from app.crypto import get_encryption_key, encrypt_value, decrypt_value, EncryptionError
 from app.config import settings
 from app.utils import format_timestamp
+from app.constants import get_user_agent_for_user
 
 
 logger = logging.getLogger(__name__)
@@ -84,8 +85,11 @@ async def receive_password(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         text="Checking your credentials... ⏳"
     )
 
+    # Derive user agent from telegram user ID
+    user_agent = get_user_agent_for_user(user_id)
+
     # Check credentials
-    result = await aima_checker.login_and_get_status(email, password)
+    result = await aima_checker.login_and_get_status(email, password, user_agent)
 
     if result['status'] == 'error':
         await status_msg.edit_text(
@@ -233,7 +237,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Check status
     status_msg = await update.message.reply_text("Checking... ⏳")
 
-    result = await aima_checker.login_and_get_status(email, password)
+    # Derive user agent from telegram user ID
+    user_agent = get_user_agent_for_user(user_id)
+
+    result = await aima_checker.login_and_get_status(email, password, user_agent)
 
     if result['status'] == 'error':
         timestamp_formatted = format_timestamp(result['timestamp'])

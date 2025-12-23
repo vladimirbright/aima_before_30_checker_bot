@@ -14,6 +14,7 @@ from app.services import user_service
 from app.crypto import get_encryption_key, decrypt_value, EncryptionError
 from app.config import settings
 from app.utils import format_timestamp
+from app.constants import get_user_agent_for_user
 
 
 logger = logging.getLogger(__name__)
@@ -146,8 +147,11 @@ class StatusScheduler:
             email = decrypt_value(user['email_encrypted'], encryption_key)
             password = decrypt_value(user['password_encrypted'], encryption_key)
 
+            # Derive user agent from telegram user ID
+            user_agent = get_user_agent_for_user(user_id)
+
             # Check status
-            result = await aima_checker.login_and_get_status(email, password)
+            result = await aima_checker.login_and_get_status(email, password, user_agent)
 
             # Handle errors
             if result['status'] == 'error':
